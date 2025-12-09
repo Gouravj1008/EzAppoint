@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(120deg, #8e44ad, #3498db);
+            animation: gradientBackground 10s ease infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            color: #fff;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="close-btn">&times;</a>
+
+    <div class="container">
+        <header>
+            <h1>Welcome</h1>
+            <p>Sign up to register your hospital</p>
+        </header>
+
+        <div class="form-container">
+            <form id="sign-up-form">
+                <h2>Hospital Sign Up</h2>
+
+                <label for="username">Hospital Username</label>
+                <input type="text" id="username" required>
+
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" pattern="[0-9]{10}" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+
+                <label for="location">City</label>
+                <input type="text" id="location" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+
+                <!-- BUTTON FIXED (NO ANCHOR TAG WRAPPING) -->
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+document.getElementById("sign-up-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const data = {
+        username: document.getElementById("username").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        email: document.getElementById("email").value,
+        location: document.getElementById("location").value,
+        password: document.getElementById("password").value
+    };
+
+    console.log("Sending Hospital Signup Data:", data);
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || "Signup failed");
+            return;
+        }
+
+        alert("Hospital registered successfully!");
+        window.location.href = "Hospital login.html";
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to connect to backend.");
+    }
+});
+</script>
+
+</body>
+</html>

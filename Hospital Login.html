@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(120deg, #43add7, #8734db);
+            color: #fff;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            color: #fff;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .message {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .success { color: #13be19; }
+        .error { color: #ff3f3f; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="close-btn">&times;</a>
+
+    <div class="container">
+        <header>
+            <h1>WELCOME</h1>
+            <p>Login as Hospital Admin</p>
+        </header>
+
+        <div class="form-container">
+            <form id="login-form">
+                <h2>Hospital Login</h2>
+
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+
+                <!-- FIXED: Removed <a> wrapper (which blocks submit event) -->
+                <button type="submit">Login</button>
+
+                <p id="message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+<script>
+document.getElementById("login-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const data = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const msg = await response.json();
+            showError(msg.message || "Login failed");
+            return;
+        }
+
+        // Parse backend response
+        const result = await response.json();
+
+        if (!result.token) {
+            showError("No token received from server.");
+            return;
+        }
+
+        // Save token
+        localStorage.setItem("jwtToken", result.token);
+
+        showSuccess("Login successful! Redirecting...");
+
+        setTimeout(() => {
+            window.location.href = "SLot Booking.html";
+        }, 1200);
+
+    } catch (error) {
+        showError("Unable to connect to server.");
+        console.error(error);
+    }
+});
+
+// Success message
+function showSuccess(message) {
+    const msg = document.getElementById("message");
+    msg.textContent = message;
+    msg.className = "message success";
+}
+
+// Error message
+function showError(message) {
+    const msg = document.getElementById("message");
+    msg.textContent = message;
+    msg.className = "message error";
+}
+</script>
+
+</body>
+</html>

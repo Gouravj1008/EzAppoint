@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextIn - Hospital Appointments</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(120deg, #84fab0, #8fd3f4);
+            color: #333;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .header .logo {
+            position: absolute;
+            left: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .details-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background-color: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 1rem;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .pagination {
+            margin-top: 1rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            margin: 0.2rem;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .page-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <span class="logo">NextIn</span>
+        <span>Hospital Booking Details</span>
+    </div>
+
+    <section class="details-container">
+        <h2>All Appointments</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Contact</th>
+                    <th>Location</th>
+                    <th>Hospital</th>
+                    <th>Specialization</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time Slot</th>
+                    <th>Token</th>
+                </tr>
+            </thead>
+
+            <tbody id="appointment-body"></tbody>
+        </table>
+
+        <div class="pagination" id="pagination"></div>
+    </section>
+
+<script>
+
+// Retrieve JWT Token
+function getToken() {
+    return localStorage.getItem("jwtToken");
+}
+
+// Create Authorized Headers
+function getHeaders() {
+    const token = getToken();
+    if (!token) {
+        alert("❌ Session expired. Please log in again.");
+        window.location.href = "Hospital Login.html";
+        return {};
+    }
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    };
+}
+
+let appointments = [];
+let currentPage = 1;
+const rowsPerPage = 10;
+
+// Fetch ALL appointments (Hospital Admin)
+async function fetchAppointmentData() {
+    try {
+        const response = await fetch("http://localhost:5000/api/appointments/all", {
+            headers: getHeaders()
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch appointments");
+
+        appointments = await response.json();
+        displayTable();
+
+    } catch (error) {
+        console.error("❌ Error loading appointments:", error);
+        alert("Failed to load hospital appointment data.");
+    }
+}
+
+// Display paginated table
+function displayTable() {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    const pageData = appointments.slice(start, end);
+
+    const tbody = document.getElementById("appointment-body");
+    tbody.innerHTML = "";
+
+    pageData.forEach(a => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${a.patientName || "N/A"}</td>
+            <td>${a.contactNumber || "N/A"}</td>
+            <td>${a.location || "N/A"}</td>
+            <td>${a.organizationName || "N/A"}</td>
+            <td>${a.specialization || "N/A"}</td>
+            <td>${a.doctorName || "N/A"}</td>
+            <td>${a.date || "N/A"}</td>
+            <td>${a.timeSlot || "N/A"}</td>
+            <td>${a.tokenNumber || "N/A"}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    createPagination();
+}
+
+// Pagination buttons
+function createPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    const pageCount = Math.ceil(appointments.length / rowsPerPage);
+
+    for (let i = 1; i <= pageCount; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "page-btn";
+
+        btn.onclick = () => {
+            currentPage = i;
+            displayTable();
+        };
+
+        pagination.appendChild(btn);
+    }
+}
+
+// Initial load
+fetchAppointmentData();
+
+</script>
+
+</body>
+</html>

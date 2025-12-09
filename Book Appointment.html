@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking</title>
+    <style>
+        .navbar {
+            position: absolute;
+            top: 20px;
+            left: 70px;
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: black;
+            text-decoration: none;
+            transition: transform 0.3s;
+            padding: 5px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(150deg, #8fd3f4, #84fab0);
+            animation: gradientBackground 10s ease infinite;
+            color: #333;
+        }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeInDown 1s ease;
+            color: #333;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .header a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .container {
+            width: 50%;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 45px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease;
+        }
+        label {
+            font-size: 1rem;
+            color: #333;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        input:focus {
+            box-shadow: 0 0 10px #8fd3f4;
+            outline: none;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+            color: red;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="close-btn">&times;</a>
+    <div class="navbar">NextIn</div>
+
+    <div class="header">
+        <h1>Appointment Booking</h1>
+        <a href="user deatils.html">User Details</a>
+    </div>
+
+    <div class="container">
+        <h2>Book your appointment</h2>
+
+        <label for="name">Patient Name:</label>
+        <input type="text" id="name" placeholder="Enter patient name">
+
+        <label for="contact">Contact Number:</label>
+        <input type="text" id="contact" placeholder="Enter your contact number" maxlength="10">
+
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" required>
+
+        <label for="location">Location (city/town):</label>
+        <input type="text" id="location" placeholder="Enter location">
+
+        <label for="hospital">Hospital Name:</label>
+        <input type="text" id="hospital" placeholder="Enter hospital name">
+
+        <label for="specialization">Specialization:</label>
+        <input type="text" id="specialization" placeholder="e.g. Cardiology">
+
+        <label for="doctor">Doctor Name:</label>
+        <input type="text" id="doctor" placeholder="Enter doctor name">
+
+        <label for="timeslot">Time Slot:</label>
+        <input type="text" id="timeslot" placeholder="e.g. 10:00-10:15 AM">
+
+        <p class="message" id="message"></p>
+
+        <button id="submitBtn" type="button">Book appointment</button>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:5000";
+
+        // Set min date = tomorrow
+        document.addEventListener("DOMContentLoaded", function () {
+            const dateInput = document.getElementById("date");
+            const today = new Date();
+            today.setDate(today.getDate() + 1);
+            const minDate = today.toISOString().split("T")[0];
+            dateInput.setAttribute("min", minDate);
+        });
+
+        // Only letters in Name
+        document.getElementById("name").addEventListener("input", function () {
+            this.value = this.value.replace(/[^a-zA-Z\s]/g, "");
+        });
+
+        // Only numbers in Contact
+        document.getElementById("contact").addEventListener("input", function () {
+            this.value = this.value.replace(/[^0-9]/g, "");
+        });
+
+        // Get JWT token
+        function getToken() {
+            return localStorage.getItem("jwtToken");
+        }
+
+        // Headers with Authorization
+        function getHeaders() {
+            const token = getToken();
+            if (!token) {
+                alert("❌ No login token found. Please log in again.");
+                window.location.href = "User login.html";
+                return {};
+            }
+            return {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            };
+        }
+
+        async function bookAppointment() {
+            const patientName = document.getElementById("name").value.trim();
+            const contactNumber = document.getElementById("contact").value.trim();
+            const date = document.getElementById("date").value;
+            const location = document.getElementById("location").value.trim();
+            const organizationName = document.getElementById("hospital").value.trim();
+            const specialization = document.getElementById("specialization").value.trim();
+            const doctorName = document.getElementById("doctor").value.trim();
+            const timeSlot = document.getElementById("timeslot").value.trim();
+            const msgEl = document.getElementById("message");
+
+            // Basic validation
+            if (!patientName || !contactNumber || !date || !location || !organizationName || !specialization || !doctorName || !timeSlot) {
+                msgEl.textContent = "Please fill in all the fields before booking.";
+                msgEl.style.color = "red";
+                return;
+            }
+
+            const data = {
+                patientName,
+                contactNumber,
+                date,
+                location,
+                organizationName,
+                specialization,
+                doctorName,
+                timeSlot
+            };
+
+            console.log("Sending booking data:", data);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/appointments/book`, {
+                    method: "POST",
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                const raw = await response.text();
+                console.log("Raw response:", raw);
+
+                let result;
+                try {
+                    result = JSON.parse(raw);
+                } catch {
+                    result = { message: raw };
+                }
+
+                if (!response.ok) {
+                    msgEl.textContent = result.message || "Failed to book appointment.";
+                    msgEl.style.color = "red";
+                    return;
+                }
+
+                const tokenNumber = result.tokenNumber || result["Token Number"] || result.queueNumber || "N/A";
+
+                document.body.innerHTML = `
+                    <body style="background: linear-gradient(150deg, #8fd3f4, #84fab0);">
+                        <div style="text-align: center; color:black; font-size: 1.5rem; margin-top: 10rem;">
+                            <h1>Appointment Confirmation</h1>
+                            <p>Appointment booked successfully.</p>
+                            <p><strong>Token Number:</strong> ${tokenNumber}</p>
+                            <a href="index.html">
+                                <button type="button" style="padding: 15px 30px; margin-top: 20px; width:150px;">
+                                    Home
+                                </button>
+                            </a>
+                        </div>
+                    </body>
+                `;
+            } catch (error) {
+                console.error("Error booking appointment:", error);
+                msgEl.textContent = "An error occurred while booking the appointment.";
+                msgEl.style.color = "red";
+            }
+        }
+
+        document.getElementById("submitBtn").addEventListener("click", bookAppointment);
+    </script>
+</body>
+</html>

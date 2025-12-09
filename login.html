@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Login</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(120deg, #43add7, #8734db);
+            animation: gradientBackground 10s ease infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            color: #fff;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1.3s ease;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 350px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .message {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        .success { color: #13be19; }
+        .error { color: #ff4444; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+<a href="index.html" class="close-btn">&times;</a>
+
+<div class="container">
+    <header>
+        <h1>Hospital Login</h1>
+        <p>Login to access your appointment panel</p>
+    </header>
+
+    <div class="form-container">
+        <form id="login-form">
+            <label for="username">Hospital Username</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" required>
+
+            <!-- FIXED: no <a> tag wrapping the button -->
+            <button type="submit">Login</button>
+
+            <p id="message" class="message"></p>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById("login-form").addEventListener("submit", async function(event) {
+    event.preventDefault(); 
+
+    const data = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            showError(result.message || "Login failed");
+            return;
+        }
+
+        // Save JWT Token
+        localStorage.setItem("jwtToken", result.token);
+
+        showSuccess("Login successful! Redirecting...");
+
+        setTimeout(() => {
+            window.location.href = "SLot Booking.html";
+        }, 1500);
+
+    } catch (error) {
+        showError("Failed to connect to backend.");
+    }
+});
+
+function showSuccess(msg) {
+    const el = document.getElementById("message");
+    el.textContent = msg;
+    el.className = "message success";
+}
+
+function showError(msg) {
+    const el = document.getElementById("message");
+    el.textContent = msg;
+    el.className = "message error";
+}
+</script>
+
+</body>
+</html>

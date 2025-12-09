@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzAppoint</title>
+    <link rel="stylesheet" href="styleland.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(120deg, #84fab0, #1bb54b);
+            animation: gradientBackground 10s ease infinite;
+            color: #333;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .navbar p {
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 1rem;
+            font-weight: bold;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .navbar a:hover {
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 6rem 2rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            background: url('https://img.freepik.com/free-vector/medical-healthcare-blue-color_1017-26807.jpg') center/cover no-repeat;
+        }
+
+        .hero img {
+            max-width: 260px;
+            animation: zoomIn 1s ease;
+        }
+
+        .doctor-doodle {
+            margin-top: 20px;
+            max-width: 240px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .cta-button a {
+            display: inline-block;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Services */
+        .services {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .service-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .service {
+            max-width: 300px;
+            padding: 2rem;
+            background-color: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .service:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Subscription Section */
+        .subscription {
+            background: #f9f9f9;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .sub-box {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .plan {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 260px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .plan:hover {
+            transform: translateY(-10px);
+        }
+
+        .plan h3 {
+            color: #1bb54b;
+        }
+
+        .plan button {
+            background: #1bb54b;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .plan button:hover {
+            background: #14913b;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div><p>EzAppoint</p></div>
+        <div>
+            <a href="User login.html">User Login</a>
+            <a href="User sign up.html">User Signup</a>
+            <a href="Hospital Login.html">Hospital Login</a>
+            <a href="Hospital sign up.html">Hospital Signup</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src=""C:\Users\goura\Downloads\Untitled design.mp4"" alt="EzAppoint Logo">
+
+        <h1>Your Health, Just a Tap Away</h1>
+        <p>Experience seamless appointment booking with EzAppoint</p>
+
+        <!-- Doctor doodle -->
+        
+        <button class="cta-button">
+            <a href="User sign up.html">Get Started</a>
+        </button>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <h2>Our Services</h2>
+        <p>Enhancing hospital efficiency and patient care.</p>
+
+        <div class="service-container">
+            <div class="service">
+                <h3>Slot Smart</h3>
+                <p>Book appointments easily with our smart scheduling system.</p>
+            </div>
+
+            <div class="service">
+                <h3>Trust Sure</h3>
+                <p>Verified tokens and receipts ensure transparency and trust.</p>
+            </div>
+
+            <div class="service">
+                <h3>Care Ease</h3>
+                <p>Find nearby hospitals and doctors with ease.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscription Model Section -->
+    <section class="subscription">
+        <h2>Subscription Plans</h2>
+        <p>Affordable plans for hospitals & clinics to manage bookings efficiently.</p>
+
+        <div class="sub-box">
+            <div class="plan">
+                <h3>Basic</h3>
+                <p>₹299/month</p>
+                <p>✔ 200 Monthly Appointments<br>✔ Basic Support<br>✔ Token System</p>
+                <button>Choose Plan</button>
+            </div>
+
+            <div class="plan">
+                <h3>Professional</h3>
+                <p>₹799/month</p>
+                <p>✔ Unlimited Appointments<br>✔ Priority Support<br>✔ Real-time Reports</p>
+                <button>Choose Plan</button>
+            </div>
+
+            <div class="plan">
+                <h3>Enterprise</h3>
+                <p>Custom Pricing</p>
+                <p>✔ Multi-branch Support<br>✔ Queue Insights Dashboard<br>✔ Dedicated Manager</p>
+                <button>Contact Us</button>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

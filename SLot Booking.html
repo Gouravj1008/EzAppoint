@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Slot</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(150deg, #8fd3f4, #84fab0);
+            animation: gradientBackground 10s ease infinite;
+            color: #333;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header a {
+            text-decoration: none;
+            color: black;
+            margin: 0px 16px;
+            padding: 10px 15px;
+            font-weight: bold;
+        }
+
+        .header h1 { margin: 0; color: #333; }
+
+        .container {
+            width: 50%;
+            margin: 40px auto;
+            background: rgba(255,255,255,0.9);
+            padding: 45px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            box-shadow: 0 0 10px #8fd3f4;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            color: black;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .close-btn:hover { transform: rotate(90deg); }
+    </style>
+</head>
+
+<body>
+<a href="index.html" class="close-btn">&times;</a>
+
+<div class="header">
+    <h1>Hospital Slot Management</h1>
+    <a href="view appointments.html">View Appointments</a>
+</div>
+
+<div class="container">
+
+    <label for="hospital-name">Hospital Name:</label>
+    <input type="text" id="hospital-name" placeholder="Enter hospital name" required
+        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
+
+    <label for="address">Address:</label>
+    <input type="text" id="address" placeholder="City/Town/Village" required>
+
+    <label for="doctor-name">Doctor's Name:</label>
+    <input type="text" id="doctor-name" placeholder="Enter Doctor's Name" required>
+
+    <label for="specialization">Specialization:</label>
+    <input type="text" id="specialization" placeholder="Enter Specialization" required>
+
+    <label for="tokens">No. of Tokens:</label>
+    <input type="number" id="tokens" placeholder="Enter No. of Tokens" min="1" required>
+
+    <label for="futureDate">Appointment Date:</label>
+    <input type="date" id="futureDate" required>
+
+    <label for="start-time">Start Time:</label>
+    <input type="time" id="start-time" required>
+
+    <label for="end-time">End Time:</label>
+    <input type="time" id="end-time" required>
+
+    <button id="create-slot" type="button">Create Slot</button>
+
+</div>
+
+<script>
+
+// Auto-set minimum date → today
+document.addEventListener("DOMContentLoaded", () => {
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("futureDate").min = today;
+
+    document.getElementById("doctor-name").addEventListener("input", function () {
+        this.value = this.value.replace(/[^a-zA-Z\s]/g, "");
+    });
+
+    document.getElementById("specialization").addEventListener("input", function () {
+        this.value = this.value.replace(/[^a-zA-Z\s]/g, "");
+    });
+
+    document.getElementById("create-slot").addEventListener("click", createSlot);
+});
+
+// Fetch stored token
+function getToken() {
+    return localStorage.getItem("jwtToken");
+}
+
+async function createSlot() {
+
+    const token = getToken();
+    if (!token) {
+        alert("❌ No login token found. Login again.");
+        window.location.href = "Hospital Login.html";
+        return;
+    }
+
+    const data = {
+        organizationName: document.getElementById("hospital-name").value,
+        address: document.getElementById("address").value,
+        doctors: [
+            {
+                name: document.getElementById("doctor-name").value,
+                specialization: document.getElementById("specialization").value,
+                availableDate: document.getElementById("futureDate").value,
+                timeFrom: document.getElementById("start-time").value,
+                timeTo: document.getElementById("end-time").value,
+                noOfTokens: parseInt(document.getElementById("tokens").value)
+            }
+        ]
+    };
+
+    // Field validation
+    if (!data.organizationName || !data.address || !data.doctors[0].name) {
+        alert("Please fill all the fields.");
+        return;
+    }
+
+    // Time validation
+    if (data.doctors[0].timeFrom >= data.doctors[0].timeTo) {
+        alert("End time must be greater than start time.");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/organization/save-details", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("✅ Slot created successfully!");
+        } else {
+            alert(`❌ Failed: ${result.message || "Server error"}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Failed to connect to backend.");
+    }
+}
+</script>
+
+</body>
+</html>
